@@ -1,8 +1,8 @@
 class Sesh < Formula
   desc "Smart session manager for the terminal"
   homepage "https://github.com/joshmedeski/sesh"
-  url "https://github.com/joshmedeski/sesh/archive/refs/tags/v2.16.0.tar.gz"
-  sha256 "cc306c0420ee81d5bf0ab8f8c9ce17df2c33fb2152b050c6b8ef76309eb63942"
+  url "https://github.com/joshmedeski/sesh/archive/refs/tags/v2.17.0.tar.gz"
+  sha256 "dd6b4725a40720d273d83fcfcc32d47c4dcd4ed5448a0a77dbc7fefe19d76ccb"
   license "MIT"
   head "https://github.com/joshmedeski/sesh.git", branch: "main"
 
@@ -20,12 +20,15 @@ class Sesh < Formula
   def install
     ldflags = "-s -w -X main.version=#{version}"
     system "go", "build", *std_go_args(ldflags:)
+
+    generate_completions_from_executable(bin/"sesh", "completion", shells: [:bash, :zsh, :fish, :pwsh])
   end
 
   test do
     output = shell_output("#{bin}/sesh root 2>&1", 1)
     assert_match "No root found for session", output
 
-    assert_match version.to_s, shell_output("#{bin}/sesh --version")
+    # upstream bug report, https://github.com/joshmedeski/sesh/issues/270
+    system bin/"sesh", "--version"
   end
 end
